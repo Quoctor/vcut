@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="001-create-video-processing-table" author="vcut-team">
+        <createTable tableName="video_processing_jobs">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="video_upload_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="processing_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="progress" type="INTEGER" defaultValue="0"/>
+            <column name="input_file_path" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="output_file_path" type="VARCHAR(1000)"/>
+            <column name="processing_parameters" type="JSONB"/>
+            <column name="video_metadata" type="JSONB"/>
+            <column name="error_details" type="TEXT"/>
+            <column name="started_at" type="TIMESTAMP"/>
+            <column name="completed_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="video_processing_jobs" indexName="idx_video_processing_upload_id">
+            <column name="video_upload_id"/>
+        </createIndex>
+
+        <createIndex tableName="video_processing_jobs" indexName="idx_video_processing_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="video_processing_jobs" indexName="idx_video_processing_type">
+            <column name="processing_type"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

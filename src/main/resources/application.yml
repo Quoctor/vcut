@@ -1,0 +1,225 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: vcut-microservices
+
+  profiles:
+    active: development
+
+  # Database Configuration
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/vcut_db
+    username: ${DB_USERNAME:vcut_user}
+    password: ${DB_PASSWORD:vcut_password}
+    pool:
+      initial-size: 10
+      max-size: 50
+      max-idle-time: 30m
+      validation-query: SELECT 1
+
+  # Liquibase Configuration
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    drop-first: false
+    contexts: development,production
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      enable-idempotence: true
+      properties:
+        max.in.flight.requests.per.connection: 1
+    consumer:
+      group-id: vcut-microservices
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "*"
+    streams:
+      application-id: vcut-streams
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
+
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  # Security Configuration
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
+# gRPC Configuration
+grpc:
+  server:
+    port: 9090
+    keep-alive-time: 30s
+    keep-alive-timeout: 5s
+    permit-keep-alive-without-calls: true
+    max-inbound-message-size: 52428800 # 50MB
+  client:
+    default-channel:
+      address: localhost:9090
+
+# Object Storage Configuration
+storage:
+  type: ${STORAGE_TYPE:minio} # minio or s3
+  minio:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SECRET_KEY:minioadmin}
+    bucket-name: ${MINIO_BUCKET:vcut-videos}
+  s3:
+    endpoint: ${S3_ENDPOINT:}
+    region: ${S3_REGION:us-east-1}
+    access-key: ${S3_ACCESS_KEY:}
+    secret-key: ${S3_SECRET_KEY:}
+    bucket-name: ${S3_BUCKET:vcut-videos}
+
+# Video Processing Configuration
+video:
+  processing:
+    ffmpeg:
+      path: ${FFMPEG_PATH:/usr/bin/ffmpeg}
+      threads: ${FFMPEG_THREADS:4}
+      temp-dir: ${TEMP_DIR:/tmp/vcut}
+    formats:
+      supported:
+        - mp4
+        - avi
+        - mov
+        - mkv
+        - webm
+    quality:
+      presets:
+        low:
+          crf: 32
+          resolution: 720p
+        medium:
+          crf: 28
+          resolution: 1080p
+        high:
+          crf: 23
+          resolution: 1080p
+        ultra:
+          crf: 18
+          resolution: 4K
+
+# Job Processing Configuration
+jobs:
+  processing:
+    thread-pool-size: ${JOB_THREAD_POOL_SIZE:10}
+    max-retries: ${JOB_MAX_RETRIES:3}
+    retry-delay: ${JOB_RETRY_DELAY:5000} # milliseconds
+
+# Notification Configuration
+notification:
+  email:
+    enabled: ${EMAIL_NOTIFICATIONS_ENABLED:true}
+    smtp:
+      host: ${EMAIL_SMTP_HOST:smtp.gmail.com}
+      port: ${EMAIL_SMTP_PORT:587}
+      username: ${EMAIL_USERNAME:}
+      password: ${EMAIL_PASSWORD:}
+  push:
+    enabled: ${PUSH_NOTIFICATIONS_ENABLED:false}
+    firebase:
+      credentials-path: ${FIREBASE_CREDENTIALS_PATH:}
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,beans,liquibase
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+
+# Logging Configuration
+logging:
+  level:
+    ru.planetmc.vcut: DEBUG
+    org.springframework.kafka: INFO
+    org.springframework.grpc: INFO
+    org.springframework.r2dbc: DEBUG
+    io.r2dbc.postgresql: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/vcut-microservices.log
+
+---
+# Development Profile
+spring:
+  config:
+    activate:
+      on-profile: development
+  liquibase:
+    contexts: development
+  kafka:
+    consumer:
+      auto-offset-reset: latest
+
+# Development-specific video storage
+storage:
+  minio:
+    endpoint: http://localhost:9000
+    bucket-name: vcut-videos-dev
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: production
+  liquibase:
+    contexts: production
+
+# Production-specific configurations
+logging:
+  level:
+    ru.planetmc.vcut: INFO
+    org.springframework: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus

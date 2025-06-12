@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package ru.planetmc.vcut.videocutting;
+
+import "common.proto";
+
+option java_package = "ru.planetmc.vcut.videocutting.proto";
+option java_outer_classname = "VideoCuttingProto";
+
+service VideoCuttingService {
+  rpc CreateCut(CreateCutRequest) returns (CreateCutResponse);
+  rpc GetCutStatus(GetCutStatusRequest) returns (GetCutStatusResponse);
+  rpc ListCuts(ListCutsRequest) returns (ListCutsResponse);
+  rpc DownloadCut(DownloadCutRequest) returns (DownloadCutResponse);
+  rpc DeleteCut(DeleteCutRequest) returns (ru.planetmc.vcut.common.Empty);
+}
+
+message CreateCutRequest {
+  string video_id = 1;
+  string user_id = 2;
+  string cut_name = 3;
+  double start_time = 4;
+  double end_time = 5;
+  CuttingOptions options = 6;
+}
+
+message CuttingOptions {
+  string output_format = 1;
+  string quality = 2;
+  bool include_audio = 3;
+  int32 max_width = 4;
+  int32 max_height = 5;
+  repeated string filters = 6;
+}
+
+message CreateCutResponse {
+  string cut_id = 1;
+  ru.planetmc.vcut.common.ProcessingStatus status = 2;
+  double estimated_duration = 3;
+}
+
+message GetCutStatusRequest {
+  string cut_id = 1;
+}
+
+message GetCutStatusResponse {
+  CutInfo cut_info = 1;
+  ru.planetmc.vcut.common.ProcessingStatus status = 2;
+}
+
+message ListCutsRequest {
+  string user_id = 1;
+  string video_id = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message ListCutsResponse {
+  repeated CutInfo cuts = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message CutInfo {
+  string id = 1;
+  string video_id = 2;
+  string user_id = 3;
+  string name = 4;
+  double start_time = 5;
+  double end_time = 6;
+  double duration = 7;
+  string output_format = 8;
+  string output_path = 9;
+  int64 output_size = 10;
+  int64 created_at = 11;
+}
+
+message DownloadCutRequest {
+  string cut_id = 1;
+  string user_id = 2;
+}
+
+message DownloadCutResponse {
+  string download_url = 1;
+  int64 expires_at = 2;
+}
+
+message DeleteCutRequest {
+  string cut_id = 1;
+  string user_id = 2;
+}

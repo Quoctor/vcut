@@ -1,0 +1,29 @@
+groups:
+  - name: vcut.rules
+    rules:
+      - alert: HighVideoProcessingLatency
+        expr: histogram_quantile(0.95, rate(video_processing_duration_seconds_bucket[5m])) > 300
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High video processing latency"
+          description: "95th percentile video processing latency is above 5 minutes"
+
+      - alert: VideoUploadFailureRate
+        expr: rate(video_upload_failures_total[5m]) / rate(video_upload_attempts_total[5m]) > 0.05
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High video upload failure rate"
+          description: "Video upload failure rate is above 5%"
+
+      - alert: KafkaConsumerLag
+        expr: kafka_consumer_lag_sum > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "Kafka consumer lag is above 1000 messages"

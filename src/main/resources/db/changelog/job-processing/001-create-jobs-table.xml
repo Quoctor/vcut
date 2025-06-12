@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="001-create-jobs-table" author="vcut-team">
+        <createTable tableName="job_queue">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="job_type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="INTEGER" defaultValue="5">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result" type="JSONB"/>
+            <column name="error_details" type="TEXT"/>
+            <column name="retry_count" type="INTEGER" defaultValue="0"/>
+            <column name="max_retries" type="INTEGER" defaultValue="3"/>
+            <column name="scheduled_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="started_at" type="TIMESTAMP"/>
+            <column name="completed_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="job_queue" indexName="idx_job_queue_type">
+            <column name="job_type"/>
+        </createIndex>
+
+        <createIndex tableName="job_queue" indexName="idx_job_queue_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="job_queue" indexName="idx_job_queue_priority">
+            <column name="priority"/>
+        </createIndex>
+
+        <createIndex tableName="job_queue" indexName="idx_job_queue_scheduled">
+            <column name="scheduled_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="001-create-video-metadata-table" author="vcut-team">
+        <createTable tableName="video_metadata">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="video_upload_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(500)"/>
+            <column name="description" type="TEXT"/>
+            <column name="duration" type="DECIMAL(10,3)"/>
+            <column name="resolution" type="VARCHAR(20)"/>
+            <column name="frame_rate" type="DECIMAL(8,3)"/>
+            <column name="bitrate" type="INTEGER"/>
+            <column name="codec" type="VARCHAR(50)"/>
+            <column name="file_format" type="VARCHAR(20)"/>
+            <column name="file_size" type="BIGINT"/>
+            <column name="aspect_ratio" type="VARCHAR(20)"/>
+            <column name="color_space" type="VARCHAR(50)"/>
+            <column name="audio_codec" type="VARCHAR(50)"/>
+            <column name="audio_bitrate" type="INTEGER"/>
+            <column name="audio_sample_rate" type="INTEGER"/>
+            <column name="thumbnails" type="JSONB"/>
+            <column name="tags" type="JSONB"/>
+            <column name="categories" type="JSONB"/>
+            <column name="upload_date" type="TIMESTAMP"/>
+            <column name="youtube_metadata" type="JSONB"/>
+            <column name="ai_analysis" type="JSONB"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="video_metadata" indexName="idx_video_metadata_upload_id">
+            <column name="video_upload_id"/>
+        </createIndex>
+
+        <createIndex tableName="video_metadata" indexName="idx_video_metadata_duration">
+            <column name="duration"/>
+        </createIndex>
+
+        <createIndex tableName="video_metadata" indexName="idx_video_metadata_resolution">
+            <column name="resolution"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vcut-microservices
+  labels:
+    app: vcut
+    environment: production

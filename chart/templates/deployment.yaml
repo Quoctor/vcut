@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vcut-microservices
+  namespace: vcut-microservices
+  labels:
+    app: vcut-microservices
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: vcut-microservices
+  template:
+    metadata:
+      labels:
+        app: vcut-microservices
+    spec:
+      containers:
+        - name: vcut-app
+          image: vcut/microservices:latest
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 9090
+              name: grpc
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vcut-secrets
+                  key: db-password
+            - name: S3_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: vcut-config
+                  key: s3-endpoint
+            - name: S3_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: vcut-config
+                  key: s3-region
+            - name: JAVA_OPTS
+              value: "-Xmx2g -Xms1g -XX:+UseG1GC"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+            - name: temp-storage
+              mountPath: /tmp/vcut
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: vcut-config
+        - name: temp-storage
+          emptyDir:
+            sizeLimit: 10Gi

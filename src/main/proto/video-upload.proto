@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package ru.planetmc.vcut.videoupload;
+
+import "common.proto";
+
+option java_package = "ru.planetmc.vcut.videoupload.proto";
+option java_outer_classname = "VideoUploadProto";
+
+service VideoUploadService {
+  rpc InitiateUpload(InitiateUploadRequest) returns (InitiateUploadResponse);
+  rpc UploadChunk(stream UploadChunkRequest) returns (UploadChunkResponse);
+  rpc CompleteUpload(CompleteUploadRequest) returns (CompleteUploadResponse);
+  rpc GetUploadStatus(GetUploadStatusRequest) returns (GetUploadStatusResponse);
+  rpc DownloadVideo(DownloadVideoRequest) returns (DownloadVideoResponse);
+}
+
+message InitiateUploadRequest {
+  string user_id = 1;
+  string filename = 2;
+  int64 file_size = 3;
+  string mime_type = 4;
+  string youtube_url = 5;
+}
+
+message InitiateUploadResponse {
+  string upload_id = 1;
+  string upload_url = 2;
+  int32 chunk_size = 3;
+}
+
+message UploadChunkRequest {
+  string upload_id = 1;
+  int32 chunk_number = 2;
+  bytes data = 3;
+  bool is_last_chunk = 4;
+}
+
+message UploadChunkResponse {
+  string upload_id = 1;
+  int32 chunks_received = 2;
+  bool upload_complete = 3;
+}
+
+message CompleteUploadRequest {
+  string upload_id = 1;
+  string checksum = 2;
+}
+
+message CompleteUploadResponse {
+  ru.planetmc.vcut.common.VideoInfo video_info = 1;
+  ru.planetmc.vcut.common.ProcessingStatus status = 2;
+}
+
+message GetUploadStatusRequest {
+  string upload_id = 1;
+}
+
+message GetUploadStatusResponse {
+  ru.planetmc.vcut.common.ProcessingStatus status = 1;
+  ru.planetmc.vcut.common.VideoInfo video_info = 2;
+}
+
+message DownloadVideoRequest {
+  string video_id = 1;
+  string user_id = 2;
+}
+
+message DownloadVideoResponse {
+  string download_url = 1;
+  int64 expires_at = 2;
+}

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package ru.planetmc.vcut.common;
+
+option java_package = "ru.planetmc.vcut.common.proto";
+option java_outer_classname = "CommonProto";
+
+message Empty {}
+
+message VideoInfo {
+  string id = 1;
+  string user_id = 2;
+  string filename = 3;
+  int64 file_size = 4;
+  string mime_type = 5;
+  string storage_path = 6;
+  int64 created_at = 7;
+}
+
+message ProcessingStatus {
+  string job_id = 1;
+  ProcessingState status = 2;
+  int32 progress = 3;
+  string message = 4;
+  int64 updated_at = 5;
+}
+
+enum ProcessingState {
+  PENDING = 0;
+  IN_PROGRESS = 1;
+  COMPLETED = 2;
+  FAILED = 3;
+  CANCELLED = 4;
+}
+
+message ErrorResponse {
+  string code = 1;
+  string message = 2;
+  string details = 3;
+  int64 timestamp = 4;
+}

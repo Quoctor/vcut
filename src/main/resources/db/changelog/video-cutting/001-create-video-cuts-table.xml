@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="001-create-video-cuts-table" author="vcut-team">
+        <createTable tableName="video_cuts">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="video_upload_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cut_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="DECIMAL(10,3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="DECIMAL(10,3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration" type="DECIMAL(10,3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="output_format" type="VARCHAR(20)" defaultValue="mp4">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quality" type="VARCHAR(20)" defaultValue="HD">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cutting_status" type="VARCHAR(50)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="output_file_path" type="VARCHAR(1000)"/>
+            <column name="output_file_size" type="BIGINT"/>
+            <column name="cutting_parameters" type="JSONB"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="processing_time" type="INTEGER"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="video_cuts" indexName="idx_video_cuts_upload_id">
+            <column name="video_upload_id"/>
+        </createIndex>
+
+        <createIndex tableName="video_cuts" indexName="idx_video_cuts_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="video_cuts" indexName="idx_video_cuts_status">
+            <column name="cutting_status"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

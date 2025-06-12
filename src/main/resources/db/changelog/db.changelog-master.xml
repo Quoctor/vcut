@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Video Upload Service -->
+    <include file="video-upload/001-create-video-uploads-table.xml" relativeToChangelogFile="true"/>
+
+    <!-- Video Processing Service -->
+    <include file="video-processing/001-create-video-processing-table.xml" relativeToChangelogFile="true"/>
+
+    <!-- Video Cutting Service -->
+    <include file="video-cutting/001-create-video-cuts-table.xml" relativeToChangelogFile="true"/>
+
+    <!-- Metadata Service -->
+    <include file="metadata/001-create-video-metadata-table.xml" relativeToChangelogFile="true"/>
+
+    <!-- Job Processing Service -->
+    <include file="job-processing/001-create-jobs-table.xml" relativeToChangelogFile="true"/>
+
+    <!-- Notification Service -->
+    <include file="notification/001-create-notifications-table.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>
